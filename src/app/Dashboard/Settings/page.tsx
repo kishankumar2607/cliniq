@@ -1,0 +1,1 @@
+// Clininc Settings(for marking clinic as open or close)
