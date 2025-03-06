@@ -61,18 +61,31 @@ INSERT INTO Patient (
  '9876-543-210', TRUE, 'S1234567', 'John Smith', 'Parent', '604-777-6666');
 
 
-
 CREATE TABLE Visit (
     visit_id SERIAL PRIMARY KEY,
     patient_id INT REFERENCES Patient(patient_id) ON DELETE CASCADE,
     clinic_id INT REFERENCES Clinic(clinic_id) ON DELETE CASCADE,
     visit_date TIMESTAMP NOT NULL,
-    notes TEXT,
+    visit_reason TEXT NOT NULL, -- New column for visit reason
     status VARCHAR(50) DEFAULT 'Pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sample Data
-INSERT INTO Visit (patient_id, clinic_id, visit_date, notes) VALUES
-(1, 1, '2023-10-01 10:00:00', 'Routine checkup'),
-(2, 2, '2023-10-02 11:00:00', 'Follow-up appointment');
+
+CREATE TABLE VisitNotes (
+    note_id SERIAL PRIMARY KEY,
+    visit_id INT REFERENCES Visit(visit_id) ON DELETE CASCADE,
+    note TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+INSERT INTO Visit (patient_id, clinic_id, visit_date, visit_reason, status) VALUES
+(1, 1, '2023-10-01 10:00:00', 'Routine checkup', 'Pending'),
+(2, 2, '2023-10-02 11:00:00', 'Follow-up appointment', 'Pending');
+
+INSERT INTO VisitNotes (visit_id, note) VALUES
+(1, 'Patient reported mild headaches.'),
+(1, 'Blood pressure checked and recorded.'),
+(2, 'Patient requested a refill for prescription.'),
+(2, 'Follow-up scheduled in 2 weeks.');
