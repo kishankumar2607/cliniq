@@ -8,22 +8,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <nav className="mt-4">
           <ul className="space-y-2">
             <li>
-              <a href="/Dashboard" className="block hover:bg-gray-100 p-2 rounded">
+              <a href="/doctor/dashboard" className="block hover:bg-gray-100 p-2 rounded">
                 Dashboard
               </a>
             </li>
             <li>
-              <a href="/Dashboard/Patients" className="block hover:bg-gray-100 p-2 rounded">
+              <a href="/dashboard/patients" className="block hover:bg-gray-100 p-2 rounded">
                 Patients
               </a>
             </li>
             <li>
-              <a href="/Dashboard/Visits" className="block hover:bg-gray-100 p-2 rounded">
+              <a href="/dashboard/visits" className="block hover:bg-gray-100 p-2 rounded">
                 Visits
               </a>
             </li>
             <li>
-              <a href="/Dashboard/Settings" className="block hover:bg-gray-100 p-2 rounded">
+              <a href="/dashboard/settings" className="block hover:bg-gray-100 p-2 rounded">
                 Settings
               </a>
             </li>

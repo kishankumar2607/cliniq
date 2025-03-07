@@ -1,4 +1,5 @@
 // Navbar
+import Image from "next/image";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -12,7 +13,7 @@ const Navbar = () => {
   return (
     <header className="border-b p-4">
     <div className="flex justify-between items-center">
-      <h1 className="text-xl font-bold">Clinic Portal</h1>
+      <Image src="/logo.svg" alt="Logo" width={120} height={40} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
