@@ -9,3 +9,83 @@ Routes
 /clinic/dashboard
 /clinic/patient/
 /clinic/patient/visit/[visitId]
+
+
+---------
+
+APIs
+
+
+Patient Register
+
+POST /api/auth/patient/register
+
+body
+{
+  "firstName": "cc",
+  "lastName": "ccc",
+  "dateOfBirth": "1990-01-01",
+  "gender": "Male",
+  "address": "123 Main St",
+  "phoneNumber": "123-456-7890",
+  "email": "blaze63beats@gmail.com",
+  "password": "123456",
+  "healthCardNumber": "HC123456789",
+  "isInternationalStudent": false,
+  "studentId": "S1234567",
+  "emergencyContactName": "Jane Doe",
+  "emergencyContactNumber": "987-654-3210",
+  "emergencyContactRelationship": "Spouse"
+}
+
+response 
+{"data":[{"patientId":11,"firstName":"cc","lastName":"ccc","dateOfBirth":"1990-01-01","gender":"Male","address":"123 Main St","phoneNumber":"123-456-7890","email":"blaze63beat@gmail.com","healthCardNumber":"HC123456789","isInternationalStudent":false,"studentId":"S1234567","emergencyContactName":"Jane Doe","emergencyContactRelationship":"Spouse","emergencyContactNumber":"987-654-3210","createdAt":"2025-03-07T16:32:13.032","userId":null}]}
+
+----------
+
+
+Patient Login
+POST /api/auth/patient/login
+
+body
+{
+  "email": "blaze63beats@gmail.com",
+  "password": "123456"
+}
+
+response 
+{"data":{"patientId":8,"firstName":"cc","lastName":"ccc","dateOfBirth":"1990-01-01","gender":"Male","address":"123 Main St","phoneNumber":"123-456-7890","email":"blaze63beats@gmail.com","healthCardNumber":"HC123456789","isInternationalStudent":false,"studentId":"S1234567","emergencyContactName":"Jane Doe","emergencyContactRelationship":"Spouse","emergencyContactNumber":"987-654-3210","createdAt":"2025-03-07T04:16:13.607","userId":null}}
+
+---------------
+
+Get a token in a clinic
+
+POST /api/clinic/1/getToken
+
+body
+{
+  "patientId": 1,
+  "visitDate": "2023-10-01T12:00:00Z",
+  "visitReason": "Routine checkup"
+}
+
+response
+{"token":4}
+
+
+-------------
+
+Get list of clinics
+
+GET /api/clinic/all
+
+reponse
+{"data":[{"clinic_id":1,"name":"KW Clinic","address":"123 Main St, Fairway, Kitchener, ON","phone":"416-123-4567"},{"clinic_id":2,"name":"Waterloo Clinic","address":"456 Elm St, Waterloo, ON","phone":"604-987-6543"}]}
+
+-------
+
+Get visits of a patient
+GET api/patient/1/visits
+
+response
+{"data":[{"visitId":1,"clinicId":1,"visitDate":"2023-10-01T10:00:00","visitReason":"Routine checkup","visitNotes":[{"note_id":1,"visit_id":1,"note":"Patient reported mild headaches.","created_at":"2025-03-07T00:01:24.195507"},{"note_id":2,"visit_id":1,"note":"Blood pressure checked and recorded.","created_at":"2025-03-07T00:01:24.195507"}],"prescriptions":[{"prescription_id":1,"visit_id":1,"medicine_name":"Medicine A","dosage":"500mg","instructions":"Take once daily","created_at":"2025-03-07T00:01:24.195507"}],"invoices":[{"invoice_id":1,"visit_id":1,"amount":100,"status":"Pending","created_at":"2025-03-07T00:01:24.195507"}]},{"visitId":3,"clinicId":1,"visitDate":"2023-10-01T12:00:00","visitReason":"Routine checkup","visitNotes":[],"prescriptions":[],"invoices":[]},{"visitId":4,"clinicId":1,"visitDate":"2023-10-01T12:00:00","visitReason":"Routine checkup","visitNotes":[],"prescriptions":[],"invoices":[]},{"visitId":5,"clinicId":1,"visitDate":"2023-10-01T12:00:00","visitReason":"Routine checkup","visitNotes":[],"prescriptions":[],"invoices":[]}]}
