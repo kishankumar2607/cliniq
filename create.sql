@@ -20,13 +20,14 @@ CREATE TABLE Clinic (
     address TEXT NOT NULL,
     phone VARCHAR(15) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Sample Data
 INSERT INTO Clinic (name, address, phone, email) VALUES
-('KW Clinic', '123 Main St, Fairway, Kitchener, ON', '416-123-4567', 'kwclinic@mail.com'),
-('Waterloo Clinic', '456 Elm St, Waterloo, ON', '604-987-6543', 'waterlooclinic@mail.com');
+('KW Clinic', '123 Main St, Fairway, Kitchener, ON', '416-123-4567', 'kwclinic@mail.com', "******"),
+('Waterloo Clinic', '456 Elm St, Waterloo, ON', '604-987-6543', 'waterlooclinic@mail.com', "*******");
 
 
 CREATE TABLE Patient (
@@ -89,3 +90,58 @@ INSERT INTO VisitNotes (visit_id, note) VALUES
 (1, 'Blood pressure checked and recorded.'),
 (2, 'Patient requested a refill for prescription.'),
 (2, 'Follow-up scheduled in 2 weeks.');
+
+
+CREATE TABLE Queue (
+    queue_id SERIAL PRIMARY KEY,
+    clinic_id INT REFERENCES Clinic(clinic_id) ON DELETE CASCADE,
+    patient_id INT REFERENCES Patient(patient_id) ON DELETE CASCADE,
+    token_number INT NOT NULL,
+    status VARCHAR(50) DEFAULT 'Waiting',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample Data
+INSERT INTO Queue (clinic_id, patient_id, token_number) VALUES
+(1, 1, 1),
+(2, 2, 2);
+
+
+-- Realtime Database
+CREATE TABLE ClinicQueueStatus (
+    clinic_id INT PRIMARY KEY REFERENCES Clinic(clinic_id) ON DELETE CASCADE,
+    current_token INT, -- The token currently being served
+    up_next_token INT, -- The token that will be served next
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO ClinicQueueStatus (clinic_id, current_token, up_next_token) VALUES
+(1, 1, 2), -- Clinic 1 is serving token 1, and token 2 is up next
+(2, 3, 4); -- Clinic 2 is serving token 3, and token 4 is up next
+
+CREATE TABLE Prescription (
+    prescription_id SERIAL PRIMARY KEY,
+    visit_id INT REFERENCES Visit(visit_id) ON DELETE CASCADE,
+    medicine_name VARCHAR(255) NOT NULL,
+    dosage VARCHAR(255) NOT NULL,
+    instructions TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample Data
+INSERT INTO Prescription (visit_id, medicine_name, dosage, instructions) VALUES
+(1, 'Medicine A', '500mg', 'Take once daily'),
+(2, 'Medicine B', '250mg', 'Take twice daily');
+
+CREATE TABLE Invoice (
+    invoice_id SERIAL PRIMARY KEY,
+    visit_id INT REFERENCES Visit(visit_id) ON DELETE CASCADE,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample Data
+INSERT INTO Invoice (visit_id, amount) VALUES
+(1, 100.00),
+(2, 150.00);

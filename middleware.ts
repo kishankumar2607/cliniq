@@ -1,0 +1,1 @@
+export { createClient } from './src/app/utils/supabase/middleware';
