@@ -1,0 +1,11 @@
+Routes
+
+/admin/login
+/admin/dashboard
+/admin/newclinic
+
+
+/clinic/login
+/clinic/dashboard
+/clinic/patient/
+/clinic/patient/visit/[visitId]
