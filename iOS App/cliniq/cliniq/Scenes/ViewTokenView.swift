@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation // Import AVFoundation to play sound
 
 struct ViewTokenView: View {
     let token: Int
@@ -13,31 +14,30 @@ struct ViewTokenView: View {
     
     @State private var currentToken: Int? = nil
     @State private var upNextToken: Int? = nil
-    @State private var isLoading: Bool = false
     @State private var errorMessage: String? = nil
     @State private var timer: Timer? = nil
+    @State private var hasPlayedDing: Bool = false // To track if the ding sound has been played
+    @State private var audioPlayer: AVAudioPlayer? // To play the ding sound
 
     var body: some View {
         VStack {
+            Spacer()
+            
             Text("Your Token")
                 .font(.largeTitle)
                 .padding()
+//                .padding(.top, 200)
+                .foregroundColor(token == currentToken ? .white : .primary) // Change text color to white if token matches
+                
             
             Text("\(token)")
                 .font(.system(size: 60, weight: .bold, design: .monospaced))
-                .foregroundColor(.accentColor)
+                .foregroundColor(token == currentToken ? .white : .accentColor) // Change text color to white if token matches
                 .padding()
             
-            Text("Please proceed to the clinic reception.")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .padding()
             
             // Display current and up-next tokens
-            if isLoading {
-                ProgressView()
-                    .padding()
-            } else if let errorMessage = errorMessage {
+            if let errorMessage = errorMessage {
                 Text("Error: \(errorMessage)")
                     .font(.headline)
                     .foregroundColor(.red)
@@ -46,18 +46,26 @@ struct ViewTokenView: View {
                 if let currentToken = currentToken {
                     Text("Current Token: \(currentToken)")
                         .font(.headline)
-                        .padding()
-                }
-                
-                if let upNextToken = upNextToken {
-                    Text("Up Next Token: \(upNextToken)")
-                        .font(.headline)
+                        .foregroundColor(token == currentToken ? .white : .primary) // Change text color to white if token matches
                         .padding()
                 }
             }
             
             Spacer()
+            if token == currentToken {
+                Text("Please proceed to the reception")
+                    .font(.subheadline)
+                    .foregroundColor(token == currentToken ? .white : .gray) // Change text color to white if token matches
+                    .padding()
+                    .background(
+                        Color.black
+                            .opacity(0.8)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    )
+            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(token == currentToken ? Color.green : Color.clear) // Change background to green if token matches
         .onAppear {
             startTimer()
         }
@@ -85,21 +93,43 @@ struct ViewTokenView: View {
 
     // Function to fetch current and up-next tokens
     private func fetchCurrentToken() {
-        isLoading = true
         errorMessage = nil
         
         NetworkManager.shared.get(endpoint: "api/clinic/\(clinicID)/currentToken") { (result: Result<CurrentTokenContainer, Error>) in
             DispatchQueue.main.async {
-                isLoading = false
-                
                 switch result {
                 case .success(let container):
-                    currentToken = container.data.currentToken
-                    upNextToken = container.data.upNextToken
+                    let newCurrentToken = container.data.currentToken
+                    let newUpNextToken = container.data.upNextToken
+                    
+                    // Update tokens
+                    currentToken = newCurrentToken
+                    upNextToken = newUpNextToken
+                    
+                    // Play ding sound only once when token matches currentToken for the first time
+                    if token == newCurrentToken && !hasPlayedDing {
+                        playDingSound()
+                        hasPlayedDing = true // Mark that the sound has been played
+                    }
                 case .failure(let error):
                     errorMessage = error.localizedDescription
                 }
             }
+        }
+    }
+
+    // Function to play ding sound
+    private func playDingSound() {
+        guard let soundURL = Bundle.main.url(forResource: "ding", withExtension: "mp3") else {
+            print("Ding sound file not found")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+            audioPlayer?.play()
+        } catch {
+            print("Failed to play ding sound: \(error.localizedDescription)")
         }
     }
 }

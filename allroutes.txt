@@ -54,7 +54,7 @@ body
 }
 
 response 
-{"data":{"patientId":8,"firstName":"cc","lastName":"ccc","dateOfBirth":"1990-01-01","gender":"Male","address":"123 Main St","phoneNumber":"123-456-7890","email":"blaze63beats@gmail.com","healthCardNumber":"HC123456789","isInternationalStudent":false,"studentId":"S1234567","emergencyContactName":"Jane Doe","emergencyContactRelationship":"Spouse","emergencyContactNumber":"987-654-3210","createdAt":"2025-03-07T04:16:13.607","userId":null}}
+{"data":{"patientId":11,"firstName":"cc","lastName":"ccc","dateOfBirth":"1990-01-01","gender":"Male","address":"123 Main St","phoneNumber":"123-456-7890","email":"blaze63beats@gmail.com","healthCardNumber":"HC123456789","isInternationalStudent":false,"studentId":"S1234567","emergencyContactName":"Jane Doe","emergencyContactRelationship":"Spouse","emergencyContactNumber":"987-654-3210","createdAt":"2025-03-07T04:16:13.607","userId":null}}
 
 ---------------
 

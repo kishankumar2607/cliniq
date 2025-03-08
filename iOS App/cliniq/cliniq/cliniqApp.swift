@@ -13,7 +13,7 @@ struct cliniqApp: App {
     @State private var isLoggedIn: Bool = false
 
     init() {
-        NetworkManager.shared.setHostURL("http://10.192.33.132:3000/")
+        NetworkManager.shared.setHostURL("http://10.0.0.64:3000/")
         checkLoginStatus()
     }
 
