@@ -1,10 +1,3 @@
-//
-//  ViewTokenView.swift
-//  cliniq
-//
-//  Created by Bibin Joseph on 2025-03-07.
-//
-
 import SwiftUI
 import AVFoundation // Import AVFoundation to play sound
 
@@ -19,6 +12,7 @@ struct ViewTokenView: View {
     @State private var hasPlayedDing: Bool = false // To track if the ding sound has been played
     @State private var audioPlayer: AVAudioPlayer? // To play the ding sound
     @State private var isBreathing: Bool = false // To control the breath animation
+    @State private var estimatedTime: String? = nil // To store the estimated time
 
     var body: some View {
         VStack {
@@ -43,16 +37,27 @@ struct ViewTokenView: View {
             
             // Display current and up-next tokens
             if let errorMessage = errorMessage {
-                Text("Error: \(errorMessage)")
+                Text("\(errorMessage)")
                     .font(.headline)
                     .foregroundColor(.red)
+                    .opacity(0.6)
                     .padding()
             } else {
                 if let currentToken = currentToken {
-                    Text("Current Token: \(currentToken)")
-                        .font(.headline)
-                        .foregroundColor(token == currentToken ? .white : .primary) // Change text color to white if token matches
-                        .padding()
+                    VStack {
+                        Text("Current Token: \(currentToken)")
+                            .font(.headline)
+                            .foregroundColor(token == currentToken ? .white : .primary) // Change text color to white if token matches
+                            .padding()
+                        
+                        // Display estimated time
+                        if let estimatedTime = estimatedTime {
+                            Text("Estimated Time: \(estimatedTime)")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                                .padding()
+                        }
+                    }
                 }
             }
             
@@ -75,7 +80,6 @@ struct ViewTokenView: View {
                 if token == currentToken {
                     Color.green
                         .ignoresSafeArea()
-//                        .opacity(isBreathing ? 0.5 : 1.0) // Breath animation opacity change
                         .saturation(isBreathing ? 1 : 1.5)
                         .animation(
                             Animation.easeInOut(duration: 1.5)
@@ -86,7 +90,6 @@ struct ViewTokenView: View {
                     Color.clear // No animation when background is white
                 }
             }
-            
         )
         .onAppear {
             startTimer()
@@ -104,6 +107,7 @@ struct ViewTokenView: View {
             } else {
                 isBreathing = false // Stop breath animation when token does not match
             }
+            calculateEstimatedTime(currentToken: newCurrentToken)
         }
     }
 
@@ -132,22 +136,48 @@ struct ViewTokenView: View {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let container):
-                    let newCurrentToken = container.data.currentToken
-                    let newUpNextToken = container.data.upNextToken
-                    
-                    // Update tokens
-                    currentToken = newCurrentToken
-                    upNextToken = newUpNextToken
-                    
-                    // Play ding sound only once when token matches currentToken for the first time
-                    if token == newCurrentToken && !hasPlayedDing {
-                        playDingSound()
-                        hasPlayedDing = true // Mark that the sound has been played
+                    if container.error != nil {
+                        errorMessage = container.error
+                        return
+                    } else if container.data != nil {
+                        let newCurrentToken = container.data!.currentToken
+                        
+                        // Update tokens
+                        currentToken = newCurrentToken
+                        
+                        // Calculate estimated time
+                        calculateEstimatedTime(currentToken: newCurrentToken)
+                        
+                        // Play ding sound only once when token matches currentToken for the first time
+                        if token == newCurrentToken && !hasPlayedDing {
+                            playDingSound()
+                            hasPlayedDing = true // Mark that the sound has been played
+                        }
                     }
                 case .failure(let error):
                     errorMessage = error.localizedDescription
                 }
             }
+        }
+    }
+
+    // Function to calculate estimated time
+    private func calculateEstimatedTime(currentToken: Int?) {
+        guard let token = token, let currentToken = currentToken, token > currentToken else {
+            estimatedTime = nil
+            return
+        }
+        
+        let tokenDifference = token - currentToken
+        let minutesToAdd = tokenDifference * 5 // Assuming each token takes 5 minutes
+        
+        let calendar = Calendar.current
+        if let estimatedDate = calendar.date(byAdding: .minute, value: minutesToAdd, to: Date()) {
+            let dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = .short
+            estimatedTime = dateFormatter.string(from: estimatedDate)
+        } else {
+            estimatedTime = nil
         }
     }
 

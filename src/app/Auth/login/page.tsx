@@ -29,8 +29,8 @@ const supabase = createClient(
 );
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("kwclinic@mail.com");
+  const [password, setPassword] = useState("123456");
   const [selectedRole, setSelectedRole] = useState("");
   const router = useRouter();
 
