@@ -9,8 +9,8 @@ import SwiftUI
 import AVFoundation // Import AVFoundation to play sound
 
 struct ViewTokenView: View {
-    let token: Int
-    let clinicID: Int // Pass the clinic ID from the previous view
+    @Binding var token: Int?
+    let clinic: Clinic // Pass the clinic ID from the previous view
     
     @State private var currentToken: Int? = nil
     @State private var upNextToken: Int? = nil
@@ -18,23 +18,28 @@ struct ViewTokenView: View {
     @State private var timer: Timer? = nil
     @State private var hasPlayedDing: Bool = false // To track if the ding sound has been played
     @State private var audioPlayer: AVAudioPlayer? // To play the ding sound
+    @State private var isBreathing: Bool = false // To control the breath animation
 
     var body: some View {
         VStack {
             Spacer()
             
+            Text(clinic.name)
+                .foregroundColor(token == currentToken ? .white : .accentColor)
+                .opacity(0.6)
+            
             Text("Your Token")
                 .font(.largeTitle)
                 .padding()
-//                .padding(.top, 200)
                 .foregroundColor(token == currentToken ? .white : .primary) // Change text color to white if token matches
                 
             
-            Text("\(token)")
-                .font(.system(size: 60, weight: .bold, design: .monospaced))
-                .foregroundColor(token == currentToken ? .white : .accentColor) // Change text color to white if token matches
-                .padding()
-            
+            if let token {
+                Text("\(token)")
+                    .font(.system(size: 60, weight: .bold, design: .monospaced))
+                    .foregroundColor(token == currentToken ? .white : .accentColor) // Change text color to white if token matches
+                    .padding()
+            }
             
             // Display current and up-next tokens
             if let errorMessage = errorMessage {
@@ -65,12 +70,40 @@ struct ViewTokenView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(token == currentToken ? Color.green : Color.clear) // Change background to green if token matches
+        .background(
+            Group {
+                if token == currentToken {
+                    Color.green
+                        .ignoresSafeArea()
+//                        .opacity(isBreathing ? 0.5 : 1.0) // Breath animation opacity change
+                        .saturation(isBreathing ? 1 : 1.5)
+                        .animation(
+                            Animation.easeInOut(duration: 1.5)
+                                .repeatForever(autoreverses: true),
+                            value: isBreathing
+                        )
+                } else {
+                    Color.clear // No animation when background is white
+                }
+            }
+            
+        )
         .onAppear {
             startTimer()
+            if token == currentToken {
+                isBreathing = true // Start breath animation if token matches
+            }
         }
         .onDisappear {
             stopTimer()
+            isBreathing = false // Stop breath animation
+        }
+        .onChange(of: currentToken) { newCurrentToken in
+            if token == newCurrentToken {
+                isBreathing = true // Start breath animation when token matches
+            } else {
+                isBreathing = false // Stop breath animation when token does not match
+            }
         }
     }
 
@@ -95,7 +128,7 @@ struct ViewTokenView: View {
     private func fetchCurrentToken() {
         errorMessage = nil
         
-        NetworkManager.shared.get(endpoint: "api/clinic/\(clinicID)/currentToken") { (result: Result<CurrentTokenContainer, Error>) in
+        NetworkManager.shared.get(endpoint: "api/clinic/\(clinic.clinicID)/currentToken") { (result: Result<CurrentTokenContainer, Error>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let container):
@@ -135,5 +168,5 @@ struct ViewTokenView: View {
 }
 
 #Preview {
-    ViewTokenView(token: 10, clinicID: 1)
+    ViewTokenView(token: .constant(10), clinic: .init(clinicID: 0, name: "Some clinic", address: "some address", phone: "456789"))
 }

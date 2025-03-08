@@ -1,11 +1,11 @@
-// Dashboard Page
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import PatientQueue from '../../components/PatientQueque'; 
+import PatientQueue from '../../components/PatientQueue'; 
 import { createClient } from '@/app/utils/supabase/server';
 
 interface QueueItem {
   queue_id: number;
+  clinic_id: number;
   token_number: number;
   status: string;
   patient: {
@@ -24,6 +24,7 @@ export default async function DashboardPage() {
     .select(
       `
       queue_id,
+      clinic_id,
       token_number,
       status,
       patient:patient_id (patient_id, first_name, last_name)
@@ -39,6 +40,7 @@ export default async function DashboardPage() {
   // Transform the data to match the QueueItem interface
   const formattedQueue: QueueItem[] = queue.map((item: any) => ({
     queue_id: item.queue_id,
+    clinic_id: item.clinic_id,
     token_number: item.token_number,
     status: item.status,
     patient: {
@@ -47,6 +49,15 @@ export default async function DashboardPage() {
       last_name: item.patient.last_name,
     },
   }));
+
+  // Fetch the current token for the clinic
+  const { data: clinicStatus } = await supabase
+    .from("clinicqueuestatus")
+    .select("current_token")
+    .eq("clinic_id", formattedQueue[0]?.clinic_id)
+    .single();
+
+  const currentToken = clinicStatus?.current_token || 0;
 
   return (
     <div className="grid gap-4">
@@ -62,7 +73,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               {/* Pass transformed queue data to the PatientQueue component */}
-              <PatientQueue queque={formattedQueue} />
+              <PatientQueue queue={formattedQueue} clinicId={formattedQueue[0]?.clinic_id} currentToken={currentToken} />
             </CardContent>
           </Card>
         </TabsContent>

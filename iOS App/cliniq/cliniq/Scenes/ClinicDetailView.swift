@@ -18,20 +18,30 @@ struct ClinicDetailView: View {
     var body: some View {
         VStack(spacing: 20) {
             // Clinic Details
-            VStack(alignment: .leading, spacing: 10) {
-                Text(clinic.name)
-                    .font(.title)
-                Text(clinic.address)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                Text(clinic.phone)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+            HStack {
+                Image(systemName: "house.lodge.circle.fill")
+                    .resizable()
+                    .opacity(0.3)
+                    .frame(width: 100, height: 100)
+                    .foregroundStyle(.accent)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(clinic.name)
+                        .font(.title)
+                    Text(clinic.address)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                    Text(clinic.phone)
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+                }
+                .padding()
             }
-            .padding()
             
+            
+            Text("Visit Reason")
+                .frame(maxWidth: .infinity)
             // Visit Reason
-            TextField("Enter visit reason", text: $visitReason)
+            TextField("Eg. Check-up", text: $visitReason)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
@@ -42,7 +52,7 @@ struct ClinicDetailView: View {
                     .padding()
             } else {
                 Button(action: getToken) {
-                    Text("Get Token")
+                    Text("Check In")
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.accentColor)
@@ -56,17 +66,21 @@ struct ClinicDetailView: View {
         }
         .padding()
         .navigationTitle("Clinic Details")
+        .navigationBarTitleDisplayMode(.inline)
         .alert(isPresented: $showAlert) {
             Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
         .background(
-            NavigationLink(destination: ViewTokenView(token: token ?? 0, clinicID: clinic.clinicID), isActive: Binding<Bool>(
+            NavigationLink(destination: ViewTokenView(token: $token, clinic: clinic), isActive: Binding<Bool>(
                 get: { token != nil },
                 set: { _ in }
             )) {
                 EmptyView()
             }
         )
+        .onAppear {
+            token = nil
+        }
     }
     
     // Get Token API Call
@@ -82,9 +96,14 @@ struct ClinicDetailView: View {
         // Format the date to the required string format
         let dateFormatter = ISO8601DateFormatter()
         let visitDateString = dateFormatter.string(from: Date())
+        guard let user = try? KeychainWrapper.shared.retrieve(forKey: "user", as: User.self) else {
+            alertMessage = "No User Found"
+            showAlert = true
+            return
+        }
         
         let getTokenParam = GetTokenParam(
-            patientID: 1, // Replace with actual patient ID
+            patientID: user.patientID, // Replace with actual patient ID
             visitDate: visitDateString, // Formatted date string
             visitReason: visitReason
         )

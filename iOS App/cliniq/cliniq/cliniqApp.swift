@@ -19,18 +19,18 @@ struct cliniqApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ViewTokenView(token: 10, clinicID: 1)
-//            if isLoggedIn {
-//                TabViewContainer(isLoggedIn: $isLoggedIn)
-//                    .onAppear {
-//                        checkLoginStatus()
-//                    }
-//            } else {
-//                LoginView(isLoggedIn: $isLoggedIn)
-//                    .onAppear {
-//                        checkLoginStatus()
-//                    }
-//            }
+//            ViewTokenView(token: 10, clinicID: 1)
+            if isLoggedIn {
+                TabViewContainer(isLoggedIn: $isLoggedIn)
+                    .onAppear {
+                        checkLoginStatus()
+                    }
+            } else {
+                LoginView(isLoggedIn: $isLoggedIn)
+                    .onAppear {
+                        checkLoginStatus()
+                    }
+            }
         }
         
     }

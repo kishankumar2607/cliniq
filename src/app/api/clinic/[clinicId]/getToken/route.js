@@ -47,8 +47,17 @@ export async function POST(request, { params }) {
 
     const visitId = visitData[0].visit_id; // Get the newly created visit ID
 
-    // Step 2: Insert into the `queue` table
-    // Fetch the last token_number for the clinic and increment it
+    // Step 2: Check if the patient is already in the queue for this clinic
+    const { data: existingQueueData, error: existingQueueError } = await supabase
+      .from('queue')
+      .select('*')
+      .eq('patient_id', patientId)
+      .eq('clinic_id', clinicId)
+      .single();
+
+    let tokenNumber;
+
+    // Fetch the last token_number for the clinic
     const { data: lastTokenData, error: lastTokenError } = await supabase
       .from('queue')
       .select('token_number')
@@ -57,28 +66,49 @@ export async function POST(request, { params }) {
       .limit(1)
       .single();
 
-    let tokenNumber = 1; // Default token number if no previous tokens exist
+    tokenNumber = 1; // Default token number if no previous tokens exist
     if (lastTokenData) {
       tokenNumber = lastTokenData.token_number + 1; // Increment the last token number
     }
 
-    const { data: queueData, error: queueError } = await supabase
-      .from('queue')
-      .insert([
-        {
-          clinic_id: clinicId,
-          patient_id: patientId,
+    if (existingQueueError || !existingQueueData) {
+      // If the patient is not in the queue for this clinic, insert a new record
+      const { data: queueData, error: queueError } = await supabase
+        .from('queue')
+        .insert([
+          {
+            clinic_id: clinicId,
+            patient_id: patientId,
+            token_number: tokenNumber,
+            status: 'pending', // Default status
+          },
+        ])
+        .select();
+
+      if (queueError) {
+        return NextResponse.json(
+          { error: queueError.message },
+          { status: 400 }
+        );
+      }
+    } else {
+      // If the patient is already in the queue for this clinic, update the existing record
+      const { data: queueData, error: queueError } = await supabase
+        .from('queue')
+        .update({
           token_number: tokenNumber,
           status: 'pending', // Default status
-        },
-      ])
-      .select();
+        })
+        .eq('clinic_id', clinicId)
+        .eq('patient_id', patientId)
+        .select();
 
-    if (queueError) {
-      return NextResponse.json(
-        { error: queueError.message },
-        { status: 400 }
-      );
+      if (queueError) {
+        return NextResponse.json(
+          { error: queueError.message },
+          { status: 400 }
+        );
+      }
     }
 
     // Step 3: Return the token number
