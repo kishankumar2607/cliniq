@@ -71,7 +71,7 @@ struct ClinicDetailView: View {
             Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
         .background(
-            NavigationLink(destination: ViewTokenView(token: $token, clinicID: clinic.clinicID), isActive: Binding<Bool>(
+            NavigationLink(destination: ViewTokenView(token: $token, clinic: clinic), isActive: Binding<Bool>(
                 get: { token != nil },
                 set: { _ in }
             )) {
@@ -96,9 +96,14 @@ struct ClinicDetailView: View {
         // Format the date to the required string format
         let dateFormatter = ISO8601DateFormatter()
         let visitDateString = dateFormatter.string(from: Date())
+        guard let user = try? KeychainWrapper.shared.retrieve(forKey: "user", as: User.self) else {
+            alertMessage = "No User Found"
+            showAlert = true
+            return
+        }
         
         let getTokenParam = GetTokenParam(
-            patientID: 1, // Replace with actual patient ID
+            patientID: user.patientID, // Replace with actual patient ID
             visitDate: visitDateString, // Formatted date string
             visitReason: visitReason
         )

@@ -10,7 +10,7 @@ import AVFoundation // Import AVFoundation to play sound
 
 struct ViewTokenView: View {
     @Binding var token: Int?
-    let clinicID: Int // Pass the clinic ID from the previous view
+    let clinic: Clinic // Pass the clinic ID from the previous view
     
     @State private var currentToken: Int? = nil
     @State private var upNextToken: Int? = nil
@@ -23,6 +23,10 @@ struct ViewTokenView: View {
     var body: some View {
         VStack {
             Spacer()
+            
+            Text(clinic.name)
+                .foregroundColor(token == currentToken ? .white : .accentColor)
+                .opacity(0.6)
             
             Text("Your Token")
                 .font(.largeTitle)
@@ -124,7 +128,7 @@ struct ViewTokenView: View {
     private func fetchCurrentToken() {
         errorMessage = nil
         
-        NetworkManager.shared.get(endpoint: "api/clinic/\(clinicID)/currentToken") { (result: Result<CurrentTokenContainer, Error>) in
+        NetworkManager.shared.get(endpoint: "api/clinic/\(clinic.clinicID)/currentToken") { (result: Result<CurrentTokenContainer, Error>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let container):
@@ -164,5 +168,5 @@ struct ViewTokenView: View {
 }
 
 #Preview {
-    ViewTokenView(token: .constant(10), clinicID: 1)
+    ViewTokenView(token: .constant(10), clinic: .init(clinicID: 0, name: "Some clinic", address: "some address", phone: "456789"))
 }

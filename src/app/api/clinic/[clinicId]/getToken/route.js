@@ -51,28 +51,28 @@ export async function POST(request, { params }) {
     const { data: existingQueueData, error: existingQueueError } = await supabase
       .from('queue')
       .select('*')
-      .eq('clinic_id', clinicId)
       .eq('patient_id', patientId)
+      .eq('clinic_id', clinicId)
       .single();
 
     let tokenNumber;
 
+    // Fetch the last token_number for the clinic
+    const { data: lastTokenData, error: lastTokenError } = await supabase
+      .from('queue')
+      .select('token_number')
+      .eq('clinic_id', clinicId)
+      .order('token_number', { ascending: false })
+      .limit(1)
+      .single();
+
+    tokenNumber = 1; // Default token number if no previous tokens exist
+    if (lastTokenData) {
+      tokenNumber = lastTokenData.token_number + 1; // Increment the last token number
+    }
+
     if (existingQueueError || !existingQueueData) {
-      // If the patient is not in the queue, fetch the last token_number for the clinic and increment it
-      const { data: lastTokenData, error: lastTokenError } = await supabase
-        .from('queue')
-        .select('token_number')
-        .eq('clinic_id', clinicId)
-        .order('token_number', { ascending: false })
-        .limit(1)
-        .single();
-
-      tokenNumber = 1; // Default token number if no previous tokens exist
-      if (lastTokenData) {
-        tokenNumber = lastTokenData.token_number + 1; // Increment the last token number
-      }
-
-      // Insert a new row into the `queue` table
+      // If the patient is not in the queue for this clinic, insert a new record
       const { data: queueData, error: queueError } = await supabase
         .from('queue')
         .insert([
@@ -92,20 +92,7 @@ export async function POST(request, { params }) {
         );
       }
     } else {
-      // If the patient is already in the queue, update the existing row with the new token number
-      const { data: lastTokenData, error: lastTokenError } = await supabase
-        .from('queue')
-        .select('token_number')
-        .eq('clinic_id', clinicId)
-        .order('token_number', { ascending: false })
-        .limit(1)
-        .single();
-
-      tokenNumber = 1; // Default token number if no previous tokens exist
-      if (lastTokenData) {
-        tokenNumber = lastTokenData.token_number + 1; // Increment the last token number
-      }
-
+      // If the patient is already in the queue for this clinic, update the existing record
       const { data: queueData, error: queueError } = await supabase
         .from('queue')
         .update({
