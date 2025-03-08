@@ -20,12 +20,22 @@ export async function GET(request, { params }) {
       .select('current_token, up_next_token')
       .eq('clinic_id', clinicId)
       .single();
+      
 
     if (error) {
-      return NextResponse.json(
-        { error: 'Failed to fetch queue status' },
-        { status: 500 }
-      );
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { data: queueStatus,
+            error: "Wait for clinic to start accepting tokens"
+           },
+          { status: 200 }
+        );
+      } else {
+        return NextResponse.json(
+          { error: 'Failed to fetch queue status' + error.message + error.details + error.code },
+          { status: 500 }
+        );
+      } 
     }
 
     // Return the current token and up-next token
@@ -35,7 +45,7 @@ export async function GET(request, { params }) {
     );
   } catch (error) {
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Internal Server Error ' + error.message},
       { status: 500 }
     );
   }

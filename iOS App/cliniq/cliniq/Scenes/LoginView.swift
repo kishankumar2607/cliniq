@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LoginView: View {
     @Binding var isLoggedIn: Bool // Binding to control login state
-    @State private var email: String = "blaze63beats@gmail.com" // Dummy data
+    @State private var email: String = "bibin@mail.com" // Dummy data
     @State private var password: String = "123456" // Dummy data
     @State private var isLoading: Bool = false
     @State private var showAlert: Bool = false

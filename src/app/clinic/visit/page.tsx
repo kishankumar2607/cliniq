@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface PatientHistory {
   id: number;
@@ -13,8 +13,20 @@ interface PatientHistory {
 export default function Visits() {
   const router = useRouter();
   const [patientHistory, setPatientHistory] = useState<PatientHistory[]>([
-    { id: 1, name: 'John Doe', visitedDate: '2023-10-01', diagnosis: 'Flu', prescribedMedication: 'Paracetamol' },
-    { id: 2, name: 'Jane Smith', visitedDate: '2023-10-02', diagnosis: 'Cold', prescribedMedication: 'Ibuprofen' },
+    {
+      id: 1,
+      name: "John Doe",
+      visitedDate: "2023-10-01",
+      diagnosis: "Flu",
+      prescribedMedication: "Paracetamol",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      visitedDate: "2023-10-02",
+      diagnosis: "Cold",
+      prescribedMedication: "Ibuprofen",
+    },
   ]);
 
   const handlePatientClick = (patientId: number) => {
@@ -49,7 +61,9 @@ export default function Visits() {
                 <td className="py-2 px-4 border-b">{patient.name}</td>
                 <td className="py-2 px-4 border-b">{patient.visitedDate}</td>
                 <td className="py-2 px-4 border-b">{patient.diagnosis}</td>
-                <td className="py-2 px-4 border-b">{patient.prescribedMedication}</td>
+                <td className="py-2 px-4 border-b">
+                  {patient.prescribedMedication}
+                </td>
               </tr>
             ))}
           </tbody>

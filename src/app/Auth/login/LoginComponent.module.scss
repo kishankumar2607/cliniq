@@ -1,0 +1,66 @@
+.mainDivStyle {
+  background-color: #bbc8ff;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardDivStyle {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 5px;
+}
+
+.accountLoginStyleDiv {
+  display: flex;
+  padding-bottom: 1.5rem;
+
+  :nth-child(n) {
+    margin-bottom: 0.5rem;
+  }
+
+  :nth-child(1) {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #4f55c9;
+  }
+  
+  :nth-child(2) {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1c2444;
+  }
+}
+
+.inputFeildDivStyle{
+	padding: 1rem 0rem;
+}
+
+.buttonDivStyle{
+	margin-top: 1.5rem;
+}
+
+.selectStyle{
+  width: 400px !important;
+  color: #1c2444 !important;
+
+  :nth-child(1) {
+    color: #1c2444 !important;
+    font-weight: 550;
+  }
+
+  :nth-child(2) {
+      border-color: #1c2444 !important;
+      border-width: 2px;
+      border-radius: 8px;
+
+      :nth-child(2) {
+        border: none !important;
+      }
+  }
+
+  :nth-child(3) {
+    color: #ff0000;
+  }
+}

@@ -1,7 +1,7 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import PatientQueue from '../../components/PatientQueue'; 
-import { createClient } from '@/app/utils/supabase/server';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import PatientQueue from "../../components/PatientQueue";
+import { createClient } from "@/app/utils/supabase/server";
 
 interface QueueItem {
   queue_id: number;
@@ -73,7 +73,11 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               {/* Pass transformed queue data to the PatientQueue component */}
-              <PatientQueue queue={formattedQueue} clinicId={formattedQueue[0]?.clinic_id} currentToken={currentToken} />
+              <PatientQueue
+                queue={formattedQueue}
+                clinicId={formattedQueue[0]?.clinic_id}
+                currentToken={currentToken}
+              />
             </CardContent>
           </Card>
         </TabsContent>
