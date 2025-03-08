@@ -5,7 +5,8 @@ import { createClient } from '@/app/utils/supabase/client'; // Use client-side S
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import { use } from 'react'; // Import `use` to unwrap the `params` Promise
+import { use } from 'react';
+import { decryptData } from "../../../../components/encryptDecryptData"
 
 export default function PatientDetails({ params }: { params: Promise<{ patientId: string }> }) {
   const supabase = createClient();
@@ -95,11 +96,11 @@ export default function PatientDetails({ params }: { params: Promise<{ patientId
           <CardTitle>Patient Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <p><strong>Name:</strong> {patient.first_name} {patient.last_name}</p>
+          <p><strong>Name:</strong> {decryptData(patient.first_name)} {decryptData(patient.last_name)}</p>
           <p><strong>Date of Birth:</strong> {patient.date_of_birth}</p>
           <p><strong>Gender:</strong> {patient.gender}</p>
           <p><strong>Email:</strong> {patient.email}</p>
-          <p><strong>Phone Number:</strong> {patient.phone_number}</p>
+          <p><strong>Phone Number:</strong> {decryptData(patient.phone_number)}</p>
         </CardContent>
       </Card>
 
