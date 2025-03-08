@@ -64,6 +64,18 @@ class NetworkManager {
                 completion(.success(decodedObject))
             } catch {
                 print("❌ Decoding Failed: \(error.localizedDescription)")
+                
+                // Attempt to parse the data as a dictionary
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        print("📦 Fallback Response Data (Dictionary): \(json)")
+                    } else {
+                        print("❌ Invalid JSON Format")
+                    }
+                } catch {
+                    print("❌ JSON Parsing Failed: \(error.localizedDescription)")
+                }
+                
                 completion(.failure(error))
             }
         }
@@ -173,6 +185,18 @@ class NetworkManager {
                 completion(.success(decodedObject))
             } catch {
                 print("❌ Decoding Failed: \(error.localizedDescription)")
+                
+                // Attempt to parse the data as a dictionary
+                do {
+                    if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        print("📦 Fallback Response Data (Dictionary): \(json)")
+                    } else {
+                        print("❌ Invalid JSON Format")
+                    }
+                } catch {
+                    print("❌ JSON Parsing Failed: \(error.localizedDescription)")
+                }
+                
                 completion(.failure(error))
             }
         }

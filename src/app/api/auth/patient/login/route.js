@@ -18,7 +18,7 @@ export async function POST(request) {
         // Authenticate the patient using email and password
         const { data: authData, error: authError } =
             await supabase.auth.signInWithPassword({
-                email,
+                email: email.toLowerCase(),
                 password,
             });
 
@@ -33,7 +33,7 @@ export async function POST(request) {
         const { data: patientData, error: patientError } = await supabase
             .from("patient")
             .select("*")
-            .eq("email", email)
+            .eq("email", email.toLowerCase())
             .single();
 
         if (patientError) {

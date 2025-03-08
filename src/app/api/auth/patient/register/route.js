@@ -11,6 +11,7 @@ export async function POST(request) {
 
     // Add created_at timestamp
     transformedData.created_at = new Date().toISOString();
+    transformedData.email = transformedData.email.toLowerCase();
 
     const supabase = await createClient(); // Initialize Supabase client
 
