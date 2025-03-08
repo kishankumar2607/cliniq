@@ -1,0 +1,13 @@
+.mainTitle {
+	font-weight: 700;
+	font-size: 40px;
+	line-height: 1.25;
+	color: #1c2444;
+}
+
+@media (max-width: 480px) {
+	.mainTitle {
+		font-size: 28px !important;
+		line-height: 36px !important;
+	}
+}
