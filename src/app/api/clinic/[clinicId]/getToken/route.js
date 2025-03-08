@@ -47,38 +47,81 @@ export async function POST(request, { params }) {
 
     const visitId = visitData[0].visit_id; // Get the newly created visit ID
 
-    // Step 2: Insert into the `queue` table
-    // Fetch the last token_number for the clinic and increment it
-    const { data: lastTokenData, error: lastTokenError } = await supabase
+    // Step 2: Check if the patient is already in the queue for this clinic
+    const { data: existingQueueData, error: existingQueueError } = await supabase
       .from('queue')
-      .select('token_number')
+      .select('*')
       .eq('clinic_id', clinicId)
-      .order('token_number', { ascending: false })
-      .limit(1)
+      .eq('patient_id', patientId)
       .single();
 
-    let tokenNumber = 1; // Default token number if no previous tokens exist
-    if (lastTokenData) {
-      tokenNumber = lastTokenData.token_number + 1; // Increment the last token number
-    }
+    let tokenNumber;
 
-    const { data: queueData, error: queueError } = await supabase
-      .from('queue')
-      .insert([
-        {
-          clinic_id: clinicId,
-          patient_id: patientId,
+    if (existingQueueError || !existingQueueData) {
+      // If the patient is not in the queue, fetch the last token_number for the clinic and increment it
+      const { data: lastTokenData, error: lastTokenError } = await supabase
+        .from('queue')
+        .select('token_number')
+        .eq('clinic_id', clinicId)
+        .order('token_number', { ascending: false })
+        .limit(1)
+        .single();
+
+      tokenNumber = 1; // Default token number if no previous tokens exist
+      if (lastTokenData) {
+        tokenNumber = lastTokenData.token_number + 1; // Increment the last token number
+      }
+
+      // Insert a new row into the `queue` table
+      const { data: queueData, error: queueError } = await supabase
+        .from('queue')
+        .insert([
+          {
+            clinic_id: clinicId,
+            patient_id: patientId,
+            token_number: tokenNumber,
+            status: 'pending', // Default status
+          },
+        ])
+        .select();
+
+      if (queueError) {
+        return NextResponse.json(
+          { error: queueError.message },
+          { status: 400 }
+        );
+      }
+    } else {
+      // If the patient is already in the queue, update the existing row with the new token number
+      const { data: lastTokenData, error: lastTokenError } = await supabase
+        .from('queue')
+        .select('token_number')
+        .eq('clinic_id', clinicId)
+        .order('token_number', { ascending: false })
+        .limit(1)
+        .single();
+
+      tokenNumber = 1; // Default token number if no previous tokens exist
+      if (lastTokenData) {
+        tokenNumber = lastTokenData.token_number + 1; // Increment the last token number
+      }
+
+      const { data: queueData, error: queueError } = await supabase
+        .from('queue')
+        .update({
           token_number: tokenNumber,
           status: 'pending', // Default status
-        },
-      ])
-      .select();
+        })
+        .eq('clinic_id', clinicId)
+        .eq('patient_id', patientId)
+        .select();
 
-    if (queueError) {
-      return NextResponse.json(
-        { error: queueError.message },
-        { status: 400 }
-      );
+      if (queueError) {
+        return NextResponse.json(
+          { error: queueError.message },
+          { status: 400 }
+        );
+      }
     }
 
     // Step 3: Return the token number
