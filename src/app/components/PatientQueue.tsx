@@ -234,11 +234,16 @@ export default function PatientQueue({
                     const decryptedLastName = decryptData(
                       queueItem.patient.last_name
                     );
+
+                    console.log("decryptedFirstName: ", decryptedFirstName);
+                    console.log("decryptedLastName: ", decryptedLastName);
+
                     const displayFirstName =
                       decryptedFirstName !== null ? decryptedFirstName : "N/A";
                     const displayLastName =
                       decryptedLastName !== null ? decryptedLastName : "N/A";
                     return `${displayFirstName} ${displayLastName}`;
+
                   })()
                 ) : (
                   <span className="text-red-500">Patient data missing</span>
