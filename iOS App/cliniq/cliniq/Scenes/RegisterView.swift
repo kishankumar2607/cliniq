@@ -10,13 +10,13 @@ import SwiftUI
 
 struct RegisterView: View {
     @Binding var isRegistered: Bool // Binding to control navigation back to LoginView
-    @State private var firstName: String = "John"
-    @State private var lastName: String = "Doe"
+    @State private var firstName: String = "Bibin"
+    @State private var lastName: String = "Tom"
     @State private var dateOfBirth: String = "1990-01-01"
     @State private var gender: String = "Male"
     @State private var address: String = "123 Main St"
     @State private var phoneNumber: String = "123-456-7890"
-    @State private var email: String = "john.doe@example.com"
+    @State private var email: String = "bibintomj@gmail.com"
     @State private var password: String = "123456"
     @State private var healthCardNumber: String = "HC123456789"
     @State private var isInternationalStudent: Bool = false
