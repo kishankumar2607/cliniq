@@ -13,17 +13,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </a>
             </li>
             <li>
-              <a href="/dashboard/patients" className="block hover:bg-gray-100 p-2 rounded">
-                Patients
-              </a>
-            </li>
-            <li>
-              <a href="/dashboard/visits" className="block hover:bg-gray-100 p-2 rounded">
+              <a href="/clinic/visit" className="block hover:bg-gray-100 p-2 rounded">
                 Visits
               </a>
             </li>
             <li>
-              <a href="/dashboard/settings" className="block hover:bg-gray-100 p-2 rounded">
+              <a href="/clinic/settings" className="block hover:bg-gray-100 p-2 rounded">
                 Settings
               </a>
             </li>
