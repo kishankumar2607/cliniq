@@ -1,0 +1,119 @@
+.inputStyle {
+  width: 400px;
+  color: #1c2444 !important;
+  :nth-child(1) {
+    color: #1c2444 !important;
+    font-weight: 550;
+  }
+
+  :nth-child(2) {
+    :nth-child(2) {
+      border-color: #1c2444 !important;
+      border-width: 2px;
+      border-radius: 8px;
+    }
+  }
+
+  :nth-child(3) {
+    color: #ff0000;
+  }
+}
+
+.passwordInputStyle {
+  width: 400px;
+  color: #1c2444 !important;
+  :nth-child(1) {
+    color: #1c2444 !important;
+    font-weight: 550;
+  }
+
+  :nth-child(2) {
+    :nth-child(3) {
+      border-color: #1c2444 !important;
+      border-width: 2px;
+      border-radius: 8px;
+    }
+  }
+
+  :nth-child(3) {
+    color: #ff0000;
+  }
+}
+
+.multilineInputStyle {
+  width: 53.7rem;
+  color: #1c2444 !important;
+  :nth-child(1) {
+    color: #1c2444 !important;
+    font-weight: 550;
+  }
+
+  :nth-child(2) {
+    :nth-child(2) {
+      border-color: #1c2444 !important;
+      font-weight: 550;
+    }
+    :nth-child(3) {
+      border-color: #1c2444 !important;
+      border-width: 2px;
+      border-radius: 8px;
+    }
+    :nth-child(4) {
+      border-color: #1c2444 !important;
+      border-width: 2px;
+      border-radius: 8px;
+    }
+  }
+
+  :nth-child(3) {
+    color: #ff0000;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .inputStyle {
+    width: 350px !important;
+  }
+  .multilineInputStyle {
+    width: 43.7rem !important;
+    }
+
+    .passwordInputStyle {
+      width: 350px !important;
+    }   
+}
+
+@media (max-width: 992px) {
+  .multilineInputStyle {
+    width: 350px !important;
+  }
+}
+
+@media (max-width: 450px) {
+  .inputStyle {
+    width: 250px !important;
+  }
+
+  .passwordInputStyle {
+    width: 250px !important;
+  } 
+
+  .multilineInputStyle {
+    width: auto !important;
+  }
+}
+
+@media (max-width: 330px) {
+  .inputStyle {
+    width: auto !important;
+  }
+
+  .passwordInputStyle {
+    width: auto !important;
+  } 
+
+  .multilineInputStyle {
+    width: auto !important;
+  }
+}
