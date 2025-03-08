@@ -42,13 +42,14 @@ interface PatientQueueProps {
 export default function PatientQueue({
   queue: initialQueue,
   clinicId,
-  currentToken,
+  currentToken: initialCurrentToken,
 }: PatientQueueProps) {
   const router = useRouter();
   const supabase = createClient();
   const [statusUpdates, setStatusUpdates] = useState<{ [key: number]: string }>(
     {}
   );
+  const [currentToken, setCurrentToken] = useState<number>(initialCurrentToken);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [assignedDoctors, setAssignedDoctors] = useState<{
     [key: number]: number;
@@ -164,7 +165,7 @@ export default function PatientQueue({
     if (error) {
       console.error("Error updating current token:", error);
     } else {
-      window.location.reload();
+      setCurrentToken(tokenNumber); // Update the state
     }
   };
 
@@ -292,10 +293,10 @@ export default function PatientQueue({
                     variant="outline"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigateToPatient(queueItem.patient.patient_id);
+                      handleMarkAsCurrent(queueItem.token_number);
                     }}
                   >
-                    View Details
+                    Mark as Current
                   </Button>
                 )}
               </TableCell>
