@@ -14,6 +14,7 @@ struct cliniqApp: App {
 
     init() {
         NetworkManager.shared.setHostURL("http://10.144.113.25:3000/")
+//        NetworkManager.shared.setHostURL("http://10.144.113.0:3000/")
         checkLoginStatus()
     }
 
