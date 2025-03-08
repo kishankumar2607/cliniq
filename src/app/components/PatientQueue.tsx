@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/app/utils/supabase/client";
+import { decryptData } from "../components/encryptDecryptData";
 
 interface QueueItem {
   queue_id: number;
@@ -39,18 +40,26 @@ interface PatientQueueProps {
   currentToken: number;
 }
 
-export default function PatientQueue({ queue, clinicId, currentToken }: PatientQueueProps) {
+export default function PatientQueue({
+  queue,
+  clinicId,
+  currentToken,
+}: PatientQueueProps) {
   const router = useRouter();
   const supabase = createClient();
-  const [statusUpdates, setStatusUpdates] = useState<{ [key: number]: string }>({});
+  const [statusUpdates, setStatusUpdates] = useState<{ [key: number]: string }>(
+    {}
+  );
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const [assignedDoctors, setAssignedDoctors] = useState<{ [key: number]: number }>({});
+  const [assignedDoctors, setAssignedDoctors] = useState<{
+    [key: number]: number;
+  }>({});
 
   // Fetch doctors from the database
   useEffect(() => {
     const fetchDoctors = async () => {
       const { data, error } = await supabase
-        .from("doctors")
+        .from("doctor")
         .select("doctor_id, first_name, last_name")
         .eq("clinic_id", clinicId);
 
@@ -64,12 +73,18 @@ export default function PatientQueue({ queue, clinicId, currentToken }: PatientQ
     fetchDoctors();
   }, [clinicId, supabase]);
 
+  console.log('data', doctors)
+
   // Function to handle "Mark as Current" button click
   const handleMarkAsCurrent = async (tokenNumber: number) => {
     const { error } = await supabase
       .from("clinicqueuestatus")
       .upsert(
-        { clinic_id: clinicId, current_token: tokenNumber, updated_at: new Date().toISOString() },
+        {
+          clinic_id: clinicId,
+          current_token: tokenNumber,
+          updated_at: new Date().toISOString(),
+        },
         { onConflict: "clinic_id" }
       );
 
@@ -126,67 +141,85 @@ export default function PatientQueue({ queue, clinicId, currentToken }: PatientQ
         </TableRow>
       </TableHeader>
       <TableBody>
-        {queue.map((queueItem) => (
-          <TableRow
-            key={queueItem.queue_id}
-            className="cursor-pointer hover:bg-gray-100"
-          >
-            <TableCell>{queueItem.token_number}</TableCell>
-            <TableCell>
-              {queueItem.patient.first_name} {queueItem.patient.last_name}
-            </TableCell>
-            <TableCell>
-              <select
-                value={statusUpdates[queueItem.queue_id] || queueItem.status}
-                onChange={(e) => handleStatusChange(queueItem.queue_id, e.target.value)}
-                className="p-1 border rounded"
-              >
-                <option value="pending">Pending</option>
-                <option value="closed">Closed</option>
-              </select>
-            </TableCell>
-            <TableCell>
-              <select
-                value={assignedDoctors[queueItem.queue_id] || queueItem.assigned_doctor_id || ""}
-                onChange={(e) => handleDoctorChange(queueItem.queue_id, Number(e.target.value))}
-                className="p-1 border rounded"
-              >
-                <option value="">Select Doctor</option>
-                {doctors.map((doctor) => (
-                  <option key={doctor.doctor_id} value={doctor.doctor_id}>
-                    Dr. {doctor.first_name} {doctor.last_name}
-                  </option>
-                ))}
-              </select>
-            </TableCell>
-            <TableCell>
-              {queueItem.token_number === currentToken ? (
-                <Badge className="bg-green-500 text-white">Current</Badge>
-              ) : (
+        {queue.map((queueItem) => {
+          const decryptedFirstName = (patientFirstName: string) =>
+            decryptData(patientFirstName);
+          const decryptedLastName = (patientLastName: string) =>
+            decryptData(patientLastName);
+          return (
+            <TableRow
+              key={queueItem.queue_id}
+              className="cursor-pointer hover:bg-gray-100"
+            >
+              <TableCell>{queueItem.token_number}</TableCell>
+              <TableCell>
+                {decryptedFirstName(queueItem.patient.first_name)}{" "}
+                {decryptedLastName(queueItem.patient.last_name)}
+              </TableCell>
+              <TableCell>
+                <select
+                  value={statusUpdates[queueItem.queue_id] || queueItem.status}
+                  onChange={(e) =>
+                    handleStatusChange(queueItem.queue_id, e.target.value)
+                  }
+                  className="p-1 border rounded"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </TableCell>
+              <TableCell>
+                <select
+                  value={
+                    assignedDoctors[queueItem.queue_id] ||
+                    queueItem.assigned_doctor_id ||
+                    ""
+                  }
+                  onChange={(e) =>
+                    handleDoctorChange(
+                      queueItem.queue_id,
+                      Number(e.target.value)
+                    )
+                  }
+                  className="p-1 border rounded"
+                >
+                  <option value="">Select Doctor</option>
+                  {doctors.map((doctor) => (
+                    <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                      Dr. {doctor.first_name} {doctor.last_name}
+                    </option>
+                  ))}
+                </select>
+              </TableCell>
+              <TableCell>
+                {queueItem.token_number === currentToken ? (
+                  <Badge className="bg-green-500 text-white">Current</Badge>
+                ) : (
+                  <Button
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMarkAsCurrent(queueItem.token_number);
+                    }}
+                  >
+                    Mark as Current
+                  </Button>
+                )}
+              </TableCell>
+              <TableCell>
                 <Button
                   variant="outline"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleMarkAsCurrent(queueItem.token_number);
+                    navigateToPatient(queueItem.patient.patient_id);
                   }}
                 >
-                  Mark as Current
+                  View Details
                 </Button>
-              )}
-            </TableCell>
-            <TableCell>
-              <Button
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateToPatient(queueItem.patient.patient_id);
-                }}
-              >
-                View Details
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
