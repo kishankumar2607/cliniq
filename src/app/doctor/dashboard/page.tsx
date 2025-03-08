@@ -18,7 +18,7 @@ export default function DashboardPage() {
               <CardTitle>Patients in Queue</CardTitle>
             </CardHeader>
             <CardContent>
-              <PatientQueue />
+              <PatientQueue queque={[]} />
             </CardContent>
           </Card>
         </TabsContent>
