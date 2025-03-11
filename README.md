@@ -45,7 +45,7 @@ To get started with CLINIQ, follow these steps to install and set up the project
 
 1. Clone the repository:
     ```bash
-   git clone https://github.com/bibintomj/cliniq
+   git clone https://github.com/kishankumar2607/cliniq.git
    ```
 
 2. Navigate to the project directory:
@@ -55,7 +55,7 @@ To get started with CLINIQ, follow these steps to install and set up the project
 
 3. Install the necessary dependencies:  
 
-    a. Install Node Modules
+    a. Install Node Modules:
         ```bash
         npm install 
         ```
